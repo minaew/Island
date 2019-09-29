@@ -6,8 +6,9 @@
 #include <fstream>
 #include <algorithm>
 #include <vector>
+#include <string>
 
-Field::Field(int size)
+Field::Field(int size, std::string id)
 {
     m_size = size;
     grid.resize(m_size*m_size);
@@ -29,6 +30,8 @@ Field::Field(int size)
     {
         grid[distribution(generator)] = GRID_FOOD;
     }
+
+    os.open(id);
 }
 
 
@@ -43,6 +46,7 @@ void Field::Add(int x, int y, Bot* bot)
     FieldEntry entry { x, y, bot };
     bots.push_back(entry);
 }
+
 
 int Field::Watch(Bot* bot, int direction)
 {
@@ -89,6 +93,7 @@ int Field::Watch(Bot* bot, int direction)
     return grid[nextx + nexty*m_size];
 }
 
+
 void Field::Step(Bot* bot, int direction)
 {
     auto it = std::find_if(bots.begin(), bots.end(), [bot](FieldEntry entry)
@@ -118,6 +123,7 @@ void Field::Step(Bot* bot, int direction)
         break;
     }
 }
+
 
 void Field::Consume(Bot* bot, int direction)
 {
@@ -154,11 +160,9 @@ void Field::Consume(Bot* bot, int direction)
     grid[new_x + new_y*m_size] = GRID_EMPTY;
 }
 
+
 void Field::Render()
 {
-    std::ostream* os;
-    os = new std::ofstream("out.txt");
-
     for (int y = 0; y < m_size; y++)
     {
         for (int x = 0; x < m_size; x++)
@@ -173,28 +177,26 @@ void Field::Render()
                 switch (grid[x + y*m_size])
                 {
                     case GRID_EMPTY:
-                        *os << "-\t";
+                        os << "-";
                         break;
 
                     case GRID_BLOCK:
-                        *os << "B\t";
+                        os << "B";
                         break;
 
                     case GRID_FOOD:
-                        *os << "F\t";
+                        os << "F";
                         break;
                 }
 
             }
             else
             {
-                *os << "X\t";
+                os << it->bot->Apperance();
             }
         }
-        *os << std::endl;
+        os << std::endl;
     }
 
-    *os << "---------------------------------------------------------------------------" << std::endl;
-
-    delete os;
+    os << '#' << std::endl;
 }

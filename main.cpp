@@ -2,46 +2,56 @@
 #include <vector>
 #include <tuple>
 #include <algorithm>
+#include <string>
 
 #include "bot.h"
 #include "fieldentry.h"
 #include "field.h"
 
+#define GENERATION_NUMBER (40)
+#define FIELD_SIZE (30)
 
 bool cmp(const std::tuple<Bot,int> &a, const std::tuple<Bot,int> &b)
 {
-    return std::get<1>(a) >= std::get<1>(b);
+    return std::get<1>(a) > std::get<1>(b);
 }
 
-int main()
+void generation(std::vector<std::tuple<Bot, int>>& round, int number)
 {
-    // create and run 100 bots
-    std::vector<std::tuple<Bot, int>> round;
-    for (int i = 0; i < 100; i++)
+    for (unsigned i = 0; i < round.size(); i++)
     {
-        Field f(10);
-        Bot b;
-        b.Reset();
-        f.Add(5, 5, &b);
+        std::string field_id = std::to_string(number) +  "_" + std::to_string(i);
 
+        Field f(FIELD_SIZE, field_id); // genarate random square field
+        Bot b = std::get<0>(round[i]);
+        b.Resurect();
+        f.Add(FIELD_SIZE/2, FIELD_SIZE/2, &b); // put bot in center
+
+        // start simulation
         int life_time = 0;
         while (!b.IsDead())
         {
             b.Run();
+            f.Render();
             life_time++;
         }
 
+        // bot in dead
         std::tuple<Bot, int> t(b, life_time);
-        round.push_back(t);
+        round[i] = t;
     }
 
-    // take top 10
+    // sort
     std::sort(round.begin(), round.end(), cmp);
 
-    for (int i = 0; i < 100; i++)
+    // print top lifetime
+    for (int i = 0; i < 5; i++)
     {
         std::cout << std::get<1>(round[i]) << std::endl;
     }
+
+    // print top program
+    std::get<0>(round.at(0)).RenderProgram();
     std::cout << "===================================" << std::endl;
 
 
@@ -56,33 +66,21 @@ int main()
             round[(i+1)*10 + j] = t;
         }
     }
+}
 
-
-    // run next 10 + new 90
-    for (int i = 0; i < 100; i++)
+int main()
+{
+    // create and 100 bots
+    std::vector<std::tuple<Bot, int>> round(100);
+    for (unsigned i = 0; i < round.size(); i++)
     {
-        Field f(10);
-        Bot b = std::get<0>(round[i]);
-        b.Resurect();
-        f.Add(5, 5, &b);
-
-        int life_time = 0;
-        while (!b.IsDead())
-        {
-            b.Run();
-            life_time++;
-        }
-
-        std::tuple<Bot, int> t(b, life_time);
-        round[i] = t;
+        Bot b;
+        std::tuple<Bot, int> t(b, 0);
+        round.at(i) = t;
     }
 
-    // take top 10
-    std::sort(round.begin(), round.end(), cmp);
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < GENERATION_NUMBER; i++)
     {
-        std::cout << std::get<1>(round[i]) << std::endl;
+        generation(round, i);
     }
-
-    return 0;
 }

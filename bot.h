@@ -18,6 +18,8 @@ class Bot
         void Reset();
         Bot Multiple();
         void Resurect();
+        void RenderProgram();
+        char Apperance() const;
 
         Field* field;
 

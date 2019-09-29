@@ -2,6 +2,8 @@
 #define FIELD_H
 
 #include <vector>
+#include <string>
+#include <fstream>
 
 #include "fieldentry.h"
 #include "bot.h"
@@ -15,7 +17,7 @@ class Bot; // FIXME: shit design
 class Field
 {
     public:
-        Field(int size);
+        Field(int size, std::string id);
         virtual ~Field();
         void Add(int x, int y, Bot* bot);
         void Render();
@@ -27,6 +29,7 @@ class Field
         int m_size;
         std::vector<int> grid;
         std::vector<FieldEntry> bots;
+        std::ofstream os;
 };
 
 #endif // FIELD_H

@@ -137,3 +137,33 @@ void Bot::Move()
         break;
     }
 }
+
+void Bot::RenderProgram()
+{
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            int index = 8*i + j;
+            std::cout << memory.at(index) << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+char Bot::Apperance() const
+{
+    switch (m_direction)
+    {
+    case 0:
+        return '^';
+    case 1:
+        return '>';
+    case 2:
+        return 'v';
+    case 3:
+        return '<';
+     default:
+        return 0;
+    }
+}
